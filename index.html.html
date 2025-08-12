@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Get Outside — Daily Outside Planner</title>
+  <meta name="description" content="Daily planner and ideas to get you outside. No car needed — just curiosity." />
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#6ee7b7; --muted:#9aa6b2; --glass: rgba(255,255,255,0.04);
+      --radius:14px; --maxw:1100px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;color:#e6eef6;background:linear-gradient(180deg,#071021 0%, #081827 40%, #06202b 100%);display:flex;align-items:flex-start;justify-content:center;padding:36px 18px;min-height:100vh}
+    .wrap{width:100%;max-width:var(--maxw)}
+    header{display:flex;gap:18px;align-items:center;margin-bottom:20px}
+    .logo{background:linear-gradient(135deg,var(--accent),#60a5fa);width:64px;height:64px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#012; font-weight:800; font-size:20px;box-shadow:0 8px 24px rgba(0,0,0,0.5)}
+    h1{margin:0;font-size:24px}
+    p.lead{margin:0;color:var(--muted)}
+
+    main{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:var(--radius); padding:18px;box-shadow:0 6px 20px rgba(2,6,23,0.6);color:#eaf6f2}
+
+    .hero{display:flex;flex-direction:column;gap:12px}
+    .control-row{display:flex;gap:10px;align-items:center}
+    button, .btn{background:var(--accent);border:0;padding:10px 14px;border-radius:10px;color:#012;font-weight:600;cursor:pointer}
+    .secondary{background:transparent;color:var(--accent);border:1px solid rgba(110,231,183,0.12)}
+    .muted{color:var(--muted)}
+
+    .activities{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+    .activity{background:var(--glass);padding:10px;border-radius:10px;font-size:14px}
+
+    .planner{display:flex;flex-direction:column;gap:8px}
+    .day-row{display:flex;gap:8px;align-items:center}
+    input[type="time"], input[type="date"], input[type="text"], textarea{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+
+    .list{max-height:320px;overflow:auto;padding-right:6px}
+    .list-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-bottom:8px;background:linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));}
+    .pill{background:rgba(255,255,255,0.04);padding:6px 8px;border-radius:999px;font-size:13px}
+
+    aside .card{position:sticky;top:18px}
+
+    .reasons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .reason{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px}
+
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+
+    @media (max-width:900px){main{grid-template-columns:1fr} .activities{grid-template-columns:1fr} .logo{width:56px;height:56px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">GO</div>
+      <div>
+        <h1>Get Outside — Daily Outside Planner</h1>
+        <p class="lead">Ideas, a quick challenge and a planner to make stepping outside a habit. Having a car? Great — but not an excuse.</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="card hero">
+        <div class="control-row">
+          <div style="flex:1">
+            <label class="muted">Choose a day</label>
+            <input id="day" type="date" />
+          </div>
+          <div>
+            <label class="muted">Difficulty</label>
+            <select id="difficulty">
+              <option value="easy">Easy (10-20 min)</option>
+              <option value="medium">Medium (20-60 min)</option>
+              <option value="adventure">Adventure (1h+)</option>
+            </select>
+          </div>
+          <div style="align-self:end">
+            <button id="suggestBtn" class="btn">Suggest an activity</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+          <div style="flex:1">
+            <h3 id="suggestion" style="margin:0;font-size:18px">Press "Suggest an activity" to get outside.</h3>
+            <p id="subsuggest" class="muted" style="margin:6px 0 0;font-size:13px">No car? We'll give you walks, local adventures and creative ways to use the wheels for fresh air without parking far away.</p>
+          </div>
+          <div style="text-align:right">
+            <button id="saveSuggestion" class="secondary">Save to planner</button>
+            <button id="randomizeMany" class="secondary">Inspire me (3)</button>
+          </div>
+        </div>
+
+        <div class="activities" id="activityGrid" aria-live="polite" style="margin-top:14px">
+          <!-- activities populate here -->
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin-top:14px">
+
+        <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+          <div style="flex:1">
+            <h4 style="margin:0">Daily small challenge</h4>
+            <p class="muted" style="margin:6px 0 0;font-size:13px">Tiny tasks that build habit. Complete one and check it off in the planner.</p>
+          </div>
+          <div>
+            <button id="challengeBtn" class="btn">Get challenge</button>
+          </div>
+        </div>
+        <div id="challenge" style="margin-top:8px" class="muted">No challenge yet.</div>
+      </section>
+
+      <aside>
+        <div class="card planner">
+          <h3 style="margin-top:0">Your planner</h3>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input id="time" type="time" />
+            <input id="title" type="text" placeholder="Activity name" />
+            <button id="addBtn" class="btn">Add</button>
+          </div>
+
+          <div class="list" id="plansList" aria-live="polite">
+            <!-- saved plans -->
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+            <button id="clearBtn" class="secondary">Clear day</button>
+            <button id="exportBtn" class="btn">Export as text</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h4 style="margin:0 0 8px 0">Reasons to go outside</h4>
+          <div class="reasons">
+            <div class="reason"><strong>1.</strong> Better mood — sunlight + movement raises serotonin.</div>
+            <div class="reason"><strong>2.</strong> Focus reset — 10 minutes outside reduces mental fatigue.</div>
+            <div class="reason"><strong>3.</strong> Vitamin D & sleep — natural rhythms and better rest.</div>
+            <div class="reason"><strong>4.</strong> Curiosity & creativity — new sights spark ideas.</div>
+          </div>
+          <p class="muted" style="margin-top:8px;font-size:13px">Having a car? great for range — but you can combine driving with short walks, park at a viewpoint, or explore a nearby street on foot. The point is to step away from screens.</p>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h4 style="margin:0 0 8px">Quick tips — no car, no problem</h4>
+          <ul class="muted" style="margin:0;padding-left:18px">
+            <li>Park 5 minutes away and walk — get instant fresh-air time.</li>
+            <li>Choose micro-goals: 10-minute loop, 20-minute aimless wander, or sit in the sun for 5 mins.</li>
+            <li>Use public transport stops as mini-adventures — hop off one stop earlier.</li>
+            <li>Make it social: invite a friend for a breathing break.</li>
+          </ul>
+        </div>
+
+      </aside>
+    </main>
+
+    <footer>
+      Built for action — press suggest, save your plan, and go. Want extra features? Ask for reminders, printable planners or a weekly habit tracker.
+    </footer>
+  </div>
+
+  <script>
+    // Seed suggestions
+    const suggestions = [
+      {text: '15-minute neighborhood walk: pick a new street to explore.', tag:'walk', difficulty:'easy'},
+      {text: 'Sit in a park and sketch or journal for 20 minutes.', tag:'mindful', difficulty:'easy'},
+      {text: 'Cycle to a nearby cafe — treat yourself to a warm drink.', tag:'ride', difficulty:'medium'},
+      {text: 'Find a hill and do a short climb for views (20-40 min).', tag:'hike', difficulty:'medium'},
+      {text: 'Nature photography: take 10 interesting photos around your area.', tag:'photo', difficulty:'easy'},
+      {text: 'Park-and-walk: drive to the edge of town and walk a new trail.', tag:'drive-walk', difficulty:'adventure'},
+      {text: 'Sunset or sunrise watch: be outside while the sky changes.', tag:'sun', difficulty:'easy'},
+      {text: 'Fruit-foraging at a community orchard (check local rules).', tag:'forage', difficulty:'adventure'},
+      {text: '15-minute barefoot grass walk (safely) — grounding and silly fun.', tag:'ground', difficulty:'easy'},
+      {text: 'Geocaching or a small local treasure hunt.', tag:'hunt', difficulty:'medium'},
+      {text: 'Outdoor bodyweight circuit in a park: 20–30 minutes.', tag:'exercise', difficulty:'medium'},
+      {text: 'Take your workphone outside for 1 focused call — stand and move.', tag:'work', difficulty:'easy'}
+    ];
+
+    const challenges = [
+      'Collect three different leaves and identify them online.',
+      'Say hello to a neighbour you haven’t talked to before.',
+      'Do a 2-minute deep-breathing session outside.',
+      'Find a new bench and read one chapter of a book there.',
+      'Go for a 20-minute aimless walk and note three new things.'
+    ];
+
+    const activityGrid = document.getElementById('activityGrid');
+    const suggestionEl = document.getElementById('suggestion');
+    const subsuggest = document.getElementById('subsuggest');
+    const suggestBtn = document.getElementById('suggestBtn');
+    const randomizeMany = document.getElementById('randomizeMany');
+    const saveSuggestionBtn = document.getElementById('saveSuggestion');
+    const challengeBtn = document.getElementById('challengeBtn');
+    const challengeEl = document.getElementById('challenge');
+
+    const dayInput = document.getElementById('day');
+    const difficultyInput = document.getElementById('difficulty');
+    const timeInput = document.getElementById('time');
+    const titleInput = document.getElementById('title');
+    const addBtn = document.getElementById('addBtn');
+    const plansList = document.getElementById('plansList');
+    const clearBtn = document.getElementById('clearBtn');
+    const exportBtn = document.getElementById('exportBtn');
+
+    // initialize date to today
+    const today = new Date().toISOString().slice(0,10);
+    dayInput.value = today;
+
+    function pickSuggestion(difficulty){
+      const pool = suggestions.filter(s=> difficulty ? s.difficulty === difficulty : true);
+      return pool[Math.floor(Math.random()*pool.length)];
+    }
+
+    function showSuggestion(){
+      const diff = difficultyInput.value;
+      const s = pickSuggestion(diff);
+      suggestionEl.textContent = s.text;
+      subsuggest.textContent = `Tag: ${s.tag} • Difficulty: ${s.difficulty}`;
+      highlightGrid(s);
+      currentSuggestion = s;
+    }
+
+    function highlightGrid(selected){
+      renderGrid(6, selected);
+    }
+
+    function renderGrid(count=6, highlight){
+      activityGrid.innerHTML = '';
+      const pool = [...suggestions].sort(()=>0.5-Math.random()).slice(0,count);
+      pool.forEach(p=>{
+        const d = document.createElement('div'); d.className='activity';
+        d.innerHTML = `<div style="font-weight:700">${escapeHtml(p.text)}</div><div class="muted" style="font-size:12px;margin-top:6px">${p.tag} • ${p.difficulty}</div>`;
+        if(highlight && highlight.text===p.text){ d.style.outline='2px solid rgba(110,231,183,0.14)'; }
+        activityGrid.appendChild(d);
+      })
+    }
+
+    function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+    let currentSuggestion = null;
+    suggestBtn.addEventListener('click', ()=>{ showSuggestion(); });
+    randomizeMany.addEventListener('click', ()=>{ renderGrid(3); suggestionEl.textContent='Here are 3 new ideas — pick one!'; subsuggest.textContent=''; currentSuggestion=null; });
+    challengeBtn.addEventListener('click', ()=>{ challengeEl.textContent = challenges[Math.floor(Math.random()*challenges.length)]; });
+
+    // Planner storage keyed by date
+    function getPlansFor(date){
+      try{ const raw = localStorage.getItem('go_plans_'+date); return raw?JSON.parse(raw):[] }catch(e){return []}
+    }
+    function savePlansFor(date,arr){ localStorage.setItem('go_plans_'+date, JSON.stringify(arr)); }
+
+    function renderPlans(){
+      const date = dayInput.value || today;
+      const plans = getPlansFor(date);
+      plansList.innerHTML = '';
+      if(plans.length===0){ plansList.innerHTML = '<div class="muted">No plans yet for this day. Save suggestions or add one below.</div>'; return; }
+      plans.sort((a,b)=> (a.time||'')>(b.time||'')?1:-1).forEach((p,i)=>{
+        const el = document.createElement('div'); el.className='list-item';
+        el.innerHTML = `<div style="display:flex;gap:12px;align-items:center"><div class="pill">${p.time||'—'}</div><div><strong>${escapeHtml(p.title)}</strong><div class="muted" style="font-size:12px">${p.note||''}</div></div></div><div><button data-i="${i}" class="secondary small">Done</button> <button data-i2="${i}" class="secondary small">Delete</button></div>`;
+        plansList.appendChild(el);
+      });
+      // add listeners
+      plansList.querySelectorAll('button').forEach(btn=>{
+        btn.addEventListener('click',(e)=>{
+          const i = e.target.getAttribute('data-i') || e.target.getAttribute('data-i2');
+          if(e.target.textContent.trim()==='Delete'){
+            plans.splice(i,1); savePlansFor(date,plans); renderPlans();
+          } else {
+            // mark done: toggle
+            plans[i].done = !plans[i].done; savePlansFor(date,plans); renderPlans();
+          }
+        })
+      })
+    }
+
+    addBtn.addEventListener('click', ()=>{
+      const date = dayInput.value || today;
+      const title = titleInput.value.trim();
+      const time = timeInput.value;
+      if(!title){ alert('Please add an activity name.'); return; }
+      const plans = getPlansFor(date);
+      plans.push({title, time, note: '', done:false});
+      savePlansFor(date,plans);
+      titleInput.value=''; timeInput.value=''; renderPlans();
+    });
+
+    saveSuggestionBtn.addEventListener('click', ()=>{
+      if(!currentSuggestion){ alert('No current suggestion — press Suggest an activity first.'); return; }
+      const date = dayInput.value || today;
+      const plans = getPlansFor(date);
+      plans.push({title: currentSuggestion.text, time: '', note:`suggestion • ${currentSuggestion.tag}`, done:false});
+      savePlansFor(date,plans);
+      renderPlans();
+      alert('Saved suggestion to planner for ' + date);
+    });
+
+    dayInput.addEventListener('change', renderPlans);
+    clearBtn.addEventListener('click', ()=>{ if(!confirm('Clear all plans for this day?')) return; savePlansFor(dayInput.value || today,[]); renderPlans(); });
+
+    exportBtn.addEventListener('click', ()=>{
+      const date = dayInput.value || today; const plans = getPlansFor(date);
+      const text = `Plans for ${date}\n\n` + (plans.length? plans.map(p=>`${p.time||'—'} — ${p.title} ${p.note?('(' + p.note + ')'):''}`).join('\n') : 'No plans');
+      // show in new window
+      const w = window.open('','_blank'); w.document.body.style.fontFamily='monospace'; w.document.body.pre.innerText = text; w.document.body.innerHTML = '<pre style="white-space:pre-wrap">' + text.replace(/</g,'&lt;') + '</pre>';
+    });
+
+    // first render
+    renderGrid(6);
+    renderPlans();
+
+    // small accessibility/keyboard tweaks
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && document.activeElement===titleInput){ addBtn.click(); } });
+
+    // Simple analytics (non-identifying) to track use in local storage
+    function bumpUsage(){
+      try{ const n = parseInt(localStorage.getItem('go_usage')||'0'); localStorage.setItem('go_usage', n+1);}catch(e){}
+    }
+    bumpUsage();
+  </script>
+</body>
+</html>
